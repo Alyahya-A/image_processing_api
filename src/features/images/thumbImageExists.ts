@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import sharp from 'sharp';
 
 const checkThumbImageExists = async (imagePath: string): Promise<boolean> => {

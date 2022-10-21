@@ -3,7 +3,9 @@ import supertest from 'supertest';
 import { Path } from '../../../consts/paths';
 import { StatusCode } from '../../../consts/statusCodes';
 import resizeImageAsThumb from '../../../features/images/resizeImage';
+import checkThumbImageExists from '../../../features/images/thumbImageExists';
 import app from '../../../index';
+import fs from 'fs';
 
 const request = supertest(app);
 
@@ -31,20 +33,25 @@ describe('Images Apis', () => {
   });
 
   it('should return 201 images created successfully!', async () => {
-    // to remove 1000x1000 if exists. so that we can create new
-    await resizeImageAsThumb('encenadaport.jpg', 1, 1);
+    const imageThumbPath = path.join(
+      Path.imagesThumbPath,
+      'encenadaport-100x100.jpg'
+    );
 
+    // to remove 100X100 if exists. so that we can create new
+    if (await checkThumbImageExists(imageThumbPath)) {
+      fs.unlink(imageThumbPath, (err) => {
+        console.error('Could not remove image');
+      });
+    }
     const response = await request.get(
-      '/api/images?imageName=encenadaport&width=1000&height=1000'
+      '/api/images?imageName=encenadaport&width=100&height=100'
     );
 
     expect(response.status).toBe(StatusCode.created);
   });
 
   it('should return 200 Ok images (Thumb image is already exists!)', async () => {
-    // to make sure that we have created 1000x1000 thum image
-    await resizeImageAsThumb('encenadaport.jpg', 100, 100);
-
     const response = await request.get(
       '/api/images?imageName=encenadaport&width=100&height=100'
     );
