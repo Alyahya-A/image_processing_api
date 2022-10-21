@@ -15,20 +15,26 @@ const images = express.Router();
 images.get('/', async (req: express.Request, res: express.Response) => {
   const height: number = Number(req.query.height) as number;
   const width: number = Number(req.query.width) as number;
-  const imageThumb: string = `${req.query.imageName as string}.jpg`;
+  const imageName: string = `${req.query.imageName as string}`;
+  const imageThumb: string = `${imageName}.jpg`;
+
+  console.log(`/images: ${imageThumb} ${height}x${width}`);
 
   if (!fs.existsSync(path.join(Path.imagesFullPath, imageThumb))) {
     res
       .status(StatusCode.notFound)
       .send(`<h1>${imageThumb} image is not found.</h1><br>`);
   } else {
-    const imageThumbPath = path.join(Path.imagesThumbPath, imageThumb);
+    const imageThumbPath = path.join(
+      Path.imagesThumbPath,
+      `${imageName}-${height}x${width}.jpg`
+    );
 
-    if (await checkThumbImageExists(imageThumbPath, height, width)) {
+    if (await checkThumbImageExists(imageThumbPath)) {
       res.status(StatusCode.ok).sendFile(imageThumbPath);
     } else {
       try {
-        await resizeImageAsThumb(imageThumb, height, width);
+        await resizeImageAsThumb(imageName, height, width);
 
         res.status(StatusCode.created).sendFile(imageThumbPath);
       } catch (error) {
