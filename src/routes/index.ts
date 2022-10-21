@@ -1,5 +1,4 @@
 import express from 'express';
-import validateParamsMiddleware from '../middlewares/validateParams';
 import images from './api/images';
 
 const routes = express.Router();
@@ -10,6 +9,6 @@ routes.get('/', (req, res) => {
   res.send('Main Api');
 });
 
-routes.use('/api/images', validateParamsMiddleware, images);
+routes.use('/api/images', images);
 
 export default routes;

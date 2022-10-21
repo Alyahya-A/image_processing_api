@@ -8,7 +8,7 @@ const createThumbDirectory = async (): Promise<void> => {
   fs.access(Path.imagesThumbPath, (err) => {
     if (err) {
       fs.mkdir(Path.imagesThumbPath, (err) => {
-        if (err) console.error('Could not create Thumb directory');
+        if (err) console.error(err, 'Could not create Thumb directory');
         else console.log('Thumb directory created successfully!');
       });
     } else {
