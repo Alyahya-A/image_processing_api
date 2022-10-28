@@ -1,16 +1,16 @@
+import fs from 'fs';
 import path from 'path';
 import supertest from 'supertest';
 import { Path } from '../../../consts/paths';
 import { StatusCode } from '../../../consts/statusCodes';
-import resizeImageAsThumb from '../../../features/images/resizeImage';
 import checkThumbImageExists from '../../../features/images/thumbImageExists';
 import app from '../../../index';
-import fs from 'fs';
 
 const request = supertest(app);
 
 describe('Images Apis', () => {
   it('/api/images should return a status of 400 (Bad request)', async () => {
+    // No params send
     const response = await request.get('/api/images');
     expect(response.status).toBe(StatusCode.badRequest);
   });
