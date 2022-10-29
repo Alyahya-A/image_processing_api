@@ -9,14 +9,10 @@ import validateParamsMiddleware from '../../middlewares/validateParams';
 
 const images = express.Router();
 
-// images.get('/', (req: express.Request, res) => {
-//   res.send('Image main API');
-// });
-
 images.get(
   '/',
   validateParamsMiddleware,
-  async (req: express.Request, res: express.Response) => {
+  async (req: express.Request, res: express.Response): Promise<void> => {
     const height: number = Number(req.query.height) as number;
     const width: number = Number(req.query.width) as number;
     const imageName: string = `${req.query.imageName as string}`;
@@ -49,7 +45,7 @@ images.get(
 
 images.get(
   '/deleteThumbs',
-  async (req: express.Request, res: express.Response) => {
+  async (req: express.Request, res: express.Response): Promise<void> => {
     try {
       // check if the directory is exists
       if (fs.existsSync(Path.imagesThumbPath)) {

@@ -3,6 +3,7 @@ import path from 'path';
 import supertest from 'supertest';
 import { Path } from '../../../consts/paths';
 import { StatusCode } from '../../../consts/statusCodes';
+import resizeImageAsThumb from '../../../features/images/resizeImage';
 import checkThumbImageExists from '../../../features/images/thumbImageExists';
 import app from '../../../index';
 
@@ -21,7 +22,7 @@ describe('Images Apis', () => {
     expect(response.status).toBe(StatusCode.badRequest);
   });
 
-  it('should return 404 image not found', async () => {
+  it('should return 404 image not found', async (): Promise<void> => {
     const response = await request.get(
       '/api/images?imageName=noImage&width=1000&height=1000'
     );
@@ -32,7 +33,7 @@ describe('Images Apis', () => {
     expect(response.status).toBe(StatusCode.notFound);
   });
 
-  it('should return 201 images created successfully!', async () => {
+  it('should return 201 images created successfully!', async (): Promise<void> => {
     const imageThumbPath = path.join(
       Path.imagesThumbPath,
       'encenadaport-100x100.jpg'
@@ -44,6 +45,9 @@ describe('Images Apis', () => {
         console.error('Could not remove image');
       });
     }
+
+    // This line will call /api/images so all business logic will be tested in that function
+    // in this way, we're really testing our endpoint which will do sharp processing (201 Created!).
     const response = await request.get(
       '/api/images?imageName=encenadaport&width=100&height=100'
     );
@@ -51,11 +55,41 @@ describe('Images Apis', () => {
     expect(response.status).toBe(StatusCode.created);
   });
 
-  it('should return 200 Ok images (Thumb image is already exists!)', async () => {
+  it('should return 200 Ok images (Thumb image is already exists!)', async (): Promise<void> => {
     const response = await request.get(
       '/api/images?imageName=encenadaport&width=100&height=100'
     );
 
     expect(response.status).toBe(StatusCode.ok);
+  });
+
+  describe('Test sharp image processing', (): void => {
+    it('Resize image as thumb', async (): Promise<void> => {
+      var isSucceed: boolean;
+
+      try {
+        await resizeImageAsThumb('encenadaport', 100, 100);
+
+        isSucceed = true;
+      } catch (error) {
+        isSucceed = false;
+      }
+
+      expect(isSucceed).toBeTruthy();
+    });
+
+    it('Must failed if image not exists', async (): Promise<void> => {
+      var isFailed: boolean;
+
+      try {
+        await resizeImageAsThumb('imagesNotExist', 100, 100);
+
+        isFailed = false;
+      } catch (error) {
+        isFailed = true;
+      }
+
+      expect(isFailed).toBeTruthy();
+    });
   });
 });
